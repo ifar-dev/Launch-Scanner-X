@@ -11,12 +11,11 @@ import os
 TELEGRAM_BOT_TOKEN = os.environ.get("TELEGRAM_BOT_TOKEN", "PUT_YOUR_BOT_TOKEN_HERE")
 TELEGRAM_CHAT_ID = os.environ.get("TELEGRAM_CHAT_ID", "PUT_YOUR_CHAT_ID_HERE")
 
-# --- Apify (X/Twitter data source) -------------------------------------
-APIFY_API_TOKEN = os.environ.get("APIFY_API_TOKEN", "PUT_YOUR_APIFY_TOKEN_HERE")
-
-# Cheapest pay-per-result tweet scraper actor as of testing.
-# Double check current pricing/availability at https://apify.com/store before relying on it.
-APIFY_ACTOR_ID = "kaitoeasyapi~twitter-x-data-tweet-scraper-pay-per-result-cheapest"
+# --- TwitterAPIs.com (X/Twitter data source) ----------------------------
+TWITTERAPIS_API_KEY = os.environ.get("TWITTERAPIS_API_KEY", "PUT_YOUR_TWITTERAPIS_KEY_HERE")
+TWITTERAPIS_BASE_URL = "https://api.twitterapis.com/twitter"
+# ~20 tweets per call at $0.0008/call. Verify current pricing at
+# https://www.twitterapis.com/pricing before relying on it long-term.
 
 # --- Search behavior -----------------------------------------------------
 # Keywords/phrases to search for on X. Keep this focused -- broader terms
@@ -30,15 +29,14 @@ SEARCH_TERMS = [
     "contract address",
 ]
 
-# How many results to pull per poll (higher = more Apify cost per run)
-# Cost math: (86400 / POLL_INTERVAL_SECONDS) * MAX_RESULTS_PER_POLL * price_per_tweet
-# At the settings below: ~5,760 reads/day -> roughly $0.58-1.44/day at
-# $0.10-0.25 per 1,000 tweets. Raise MAX_RESULTS_PER_POLL or lower the
-# interval only if you're missing launches -- both cost money linearly.
+# How many results to pull per poll. TwitterAPIs.com returns ~20 tweets
+# per call regardless of this number -- set it to a multiple of 20 and the
+# scanner will page (via cursor) to fetch that many, each page = 1 billed call.
+# Cost math: (86400 / POLL_INTERVAL_SECONDS) * (MAX_RESULTS_PER_POLL / 20) * $0.0008
+# At the settings below: ~288 polls/day * 1 call/poll * $0.0008 = ~$0.23/day.
 MAX_RESULTS_PER_POLL = 20
 
 # How often to poll, in seconds. 5 minutes still catches a launch within
-# its first few minutes while keeping Apify spend low. Each poll costs
-# ~MAX_RESULTS_PER_POLL tweets worth of credits regardless of how many
-# turn out to be new.
+# its first few minutes while keeping spend low. Each poll costs at least
+# one $0.0008 call regardless of how many results turn out to be new.
 POLL_INTERVAL_SECONDS = 300
