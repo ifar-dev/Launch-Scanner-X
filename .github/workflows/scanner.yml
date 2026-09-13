@@ -30,7 +30,7 @@ jobs:
         env:
           TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
           TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
-          APIFY_API_TOKEN: ${{ secrets.APIFY_API_TOKEN }}
+          TWITTERAPIS_API_KEY: ${{ secrets.TWITTERAPIS_API_KEY }}
         run: python scanner_gh.py
 
       - name: Commit updated state
