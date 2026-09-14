@@ -34,6 +34,9 @@ SEARCH_TERMS = [
     "trading now",
     "live on",
     "launched on",
+    "listed on robinhood",
+    "now on robinhood",
+    "added to robinhood",
 ]
 
 # Phrases that should NEVER trigger an alert, even if they match a search
@@ -41,6 +44,8 @@ SEARCH_TERMS = [
 # creating noise (e.g. a specific bot/account phrase you don't want).
 EXCLUDE_PHRASES = [
     "moonshot push is live",
+    "airdrop is live",
+    "airdrop",
 ]
 
 # --- Watched accounts -----------------------------------------------------
