@@ -26,6 +26,17 @@ SEARCH_TERMS = [
     "is live now",
     "now trading",
     "will be listing",
+    "launchpad is live",
+]
+
+# --- Watched accounts -----------------------------------------------------
+# X usernames (no @) to monitor directly. ANY original post from these
+# accounts containing a $TICKER or contract address triggers an alert --
+# no launch-phrase match required, since the source itself is the signal.
+# Leave empty to disable this feature.
+WATCHED_ACCOUNTS = [
+    # "someaccount",
+    # "anotheraccount",
 ]
 
 # How many results to pull per poll. TwitterAPIs.com returns ~20 tweets
@@ -35,6 +46,10 @@ SEARCH_TERMS = [
 # At the settings below: ~288 polls/day * 1 call/poll * $0.0008 = ~$0.23/day.
 MAX_RESULTS_PER_POLL = 20
 
+# How often to poll, in seconds. 5 minutes catches a launch within its
+# first few minutes. Each poll costs at least one $0.0008 call regardless
+# of how many results turn out to be new.
+POLL_INTERVAL_SECONDS = 300
 # How often to poll, in seconds. 5 minutes catches a launch within its
 # first few minutes. Each poll costs at least one $0.0008 call regardless
 # of how many results turn out to be new.
