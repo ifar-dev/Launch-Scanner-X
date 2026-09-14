@@ -12,6 +12,7 @@ LAUNCH_SIGNAL_WORDS = [
     "is live now",
     "now trading",
     "will be listing",
+    "launchpad is live",
 ]
 
 
