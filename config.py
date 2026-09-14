@@ -27,6 +27,13 @@ SEARCH_TERMS = [
     "now trading",
     "will be listing",
     "launchpad is live",
+    "just launched",
+    "now live",
+    "officially launched",
+    "officially live",
+    "trading now",
+    "live on",
+    "launched on",
 ]
 
 # Phrases that should NEVER trigger an alert, even if they match a search
