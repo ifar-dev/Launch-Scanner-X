@@ -13,6 +13,13 @@ LAUNCH_SIGNAL_WORDS = [
     "now trading",
     "will be listing",
     "launchpad is live",
+    "just launched",
+    "now live",
+    "officially launched",
+    "officially live",
+    "trading now",
+    "live on",
+    "launched on",
 ]
 
 
