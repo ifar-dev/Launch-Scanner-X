@@ -29,6 +29,13 @@ SEARCH_TERMS = [
     "launchpad is live",
 ]
 
+# Phrases that should NEVER trigger an alert, even if they match a search
+# term above. Case-insensitive substring match. Add anything here that's
+# creating noise (e.g. a specific bot/account phrase you don't want).
+EXCLUDE_PHRASES = [
+    "moonshot push is live",
+]
+
 # --- Watched accounts -----------------------------------------------------
 # X usernames (no @) to monitor directly. ANY original post from these
 # accounts containing a $TICKER or contract address triggers an alert --
@@ -46,10 +53,6 @@ WATCHED_ACCOUNTS = [
 # At the settings below: ~288 polls/day * 1 call/poll * $0.0008 = ~$0.23/day.
 MAX_RESULTS_PER_POLL = 20
 
-# How often to poll, in seconds. 5 minutes catches a launch within its
-# first few minutes. Each poll costs at least one $0.0008 call regardless
-# of how many results turn out to be new.
-POLL_INTERVAL_SECONDS = 300
 # How often to poll, in seconds. 5 minutes catches a launch within its
 # first few minutes. Each poll costs at least one $0.0008 call regardless
 # of how many results turn out to be new.
