@@ -19,14 +19,13 @@ TWITTERAPIS_BASE_URL = "https://api.twitterapis.com/twitter"
 
 # --- Search behavior -----------------------------------------------------
 # Keywords/phrases to search for on X. Keep this focused -- broader terms
-# mean more noise and more Apify credits spent per poll.
+# mean more noise and more billed calls per poll.
 SEARCH_TERMS = [
-    "new token launch",
-    "fair launch",
-    "stealth launch",
-    "just launched $",
-    "presale live",
-    "contract address",
+    "just went live",
+    "is live",
+    "is live now",
+    "now trading",
+    "will be listing",
 ]
 
 # How many results to pull per poll. TwitterAPIs.com returns ~20 tweets
@@ -36,7 +35,7 @@ SEARCH_TERMS = [
 # At the settings below: ~288 polls/day * 1 call/poll * $0.0008 = ~$0.23/day.
 MAX_RESULTS_PER_POLL = 20
 
-# How often to poll, in seconds. 5 minutes still catches a launch within
-# its first few minutes while keeping spend low. Each poll costs at least
-# one $0.0008 call regardless of how many results turn out to be new.
+# How often to poll, in seconds. 5 minutes catches a launch within its
+# first few minutes. Each poll costs at least one $0.0008 call regardless
+# of how many results turn out to be new.
 POLL_INTERVAL_SECONDS = 300
