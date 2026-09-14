@@ -27,7 +27,8 @@ SEARCH_ENDPOINT = f"{config.TWITTERAPIS_BASE_URL}/tweet/advanced_search"
 
 def build_search_query() -> str:
     terms = " OR ".join(f'"{t}"' for t in config.SEARCH_TERMS)
-    return f"({terms}) -filter:replies -filter:retweets lang:en"
+    excludes = " ".join(f'-"{p}"' for p in config.EXCLUDE_PHRASES)
+    return f"({terms}) {excludes} -filter:replies -filter:retweets lang:en".strip()
 
 
 def build_watch_query():
@@ -124,9 +125,14 @@ def format_watch_alert(tweet: dict, cashtags, eth_addrs, sol_addrs) -> str:
     )
 
 
+def is_excluded(text: str) -> bool:
+    lowered = text.lower()
+    return any(p.lower() in lowered for p in config.EXCLUDE_PHRASES)
+
+
 def process_keyword_tweets(tweets, seen_ids) -> int:
     """Existing logic: require BOTH a launch-phrase match AND a detected
-    ticker/contract before alerting."""
+    ticker/contract before alerting, excluding anything in EXCLUDE_PHRASES."""
     sent = 0
     for tweet in tweets:
         tweet_id = str(tweet.get("id") or tweet.get("tweetId") or tweet.get("url"))
@@ -135,6 +141,8 @@ def process_keyword_tweets(tweets, seen_ids) -> int:
         seen_ids.add(tweet_id)
 
         text = tweet.get("text", "")
+        if is_excluded(text):
+            continue
         if not looks_like_launch(text):
             continue
 
