@@ -20,6 +20,9 @@ LAUNCH_SIGNAL_WORDS = [
     "trading now",
     "live on",
     "launched on",
+    "listed on robinhood",
+    "now on robinhood",
+    "added to robinhood",
 ]
 
 
