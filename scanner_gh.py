@@ -142,6 +142,7 @@ def process_keyword_tweets(tweets, seen_ids) -> int:
 
         text = tweet.get("text", "")
         if is_excluded(text):
+            log.info("Excluded (matched EXCLUDE_PHRASES): %s", text[:100])
             continue
         if not looks_like_launch(text):
             continue
