@@ -21,22 +21,7 @@ TWITTERAPIS_BASE_URL = "https://api.twitterapis.com/twitter"
 # Keywords/phrases to search for on X. Keep this focused -- broader terms
 # mean more noise and more billed calls per poll.
 SEARCH_TERMS = [
-    "just went live",
     "is live",
-    "is live now",
-    "now trading",
-    "will be listing",
-    "launchpad is live",
-    "just launched",
-    "now live",
-    "officially launched",
-    "officially live",
-    "trading now",
-    "live on",
-    "launched on",
-    "listed on robinhood",
-    "now on robinhood",
-    "added to robinhood",
 ]
 
 # Phrases that should NEVER trigger an alert, even if they match a search
