@@ -47,10 +47,11 @@ WATCHED_ACCOUNTS = [
 # per call regardless of this number -- set it to a multiple of 20 and the
 # scanner will page (via cursor) to fetch that many, each page = 1 billed call.
 # Cost math: (86400 / POLL_INTERVAL_SECONDS) * (MAX_RESULTS_PER_POLL / 20) * $0.0008
-# At the settings below: ~288 polls/day * 1 call/poll * $0.0008 = ~$0.23/day.
+# At the settings below: ~96 polls/day * 1 call/poll * $0.0008 = ~$0.08/day.
 MAX_RESULTS_PER_POLL = 20
 
-# How often to poll, in seconds. 5 minutes catches a launch within its
-# first few minutes. Each poll costs at least one $0.0008 call regardless
-# of how many results turn out to be new.
-POLL_INTERVAL_SECONDS = 300
+# How often to poll, in seconds. 15 minutes cuts cost roughly 3x vs 5-min
+# polling while still catching a launch well within its early window.
+# Each poll costs at least one $0.0008 call regardless of how many
+# results turn out to be new.
+POLL_INTERVAL_SECONDS = 900
