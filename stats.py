@@ -17,6 +17,7 @@ def load_stats(path: str) -> dict:
         "total_alerts": 0,
         "keyword_alerts": 0,
         "watch_alerts": 0,
+        "total_tweets_fetched": 0,
         "since": _now_iso(),
         "last_updated": None,
     }
@@ -33,11 +34,12 @@ def load_stats(path: str) -> dict:
     return data
 
 
-def record_run(path: str, keyword_alerts: int, watch_alerts: int):
+def record_run(path: str, keyword_alerts: int, watch_alerts: int, tweets_fetched: int = 0):
     stats = load_stats(path)
     stats["keyword_alerts"] += keyword_alerts
     stats["watch_alerts"] += watch_alerts
     stats["total_alerts"] += keyword_alerts + watch_alerts
+    stats["total_tweets_fetched"] += tweets_fetched
     stats["last_updated"] = _now_iso()
 
     os.makedirs(os.path.dirname(path) or ".", exist_ok=True)
