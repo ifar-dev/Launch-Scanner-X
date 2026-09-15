@@ -10,6 +10,7 @@ to the repo after each run.
 
 import logging
 import os
+from datetime import datetime, timezone
 
 import requests
 
@@ -138,7 +139,7 @@ def process_keyword_tweets(tweets, seen_ids) -> int:
         tweet_id = str(tweet.get("id") or tweet.get("tweetId") or tweet.get("url"))
         if not tweet_id or tweet_id in seen_ids:
             continue
-        seen_ids.add(tweet_id)
+        seen_ids[tweet_id] = datetime.now(timezone.utc).isoformat()
 
         text = tweet.get("text", "")
         if is_excluded(text):
@@ -164,7 +165,7 @@ def process_watched_account_tweets(tweets, seen_ids) -> int:
         tweet_id = str(tweet.get("id") or tweet.get("tweetId") or tweet.get("url"))
         if not tweet_id or tweet_id in seen_ids:
             continue
-        seen_ids.add(tweet_id)
+        seen_ids[tweet_id] = datetime.now(timezone.utc).isoformat()
 
         text = tweet.get("text", "")
         cashtags, eth_addrs, sol_addrs = extract_signals(text)
