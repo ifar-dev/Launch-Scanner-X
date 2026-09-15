@@ -7,22 +7,7 @@ ETH_ADDR_RE = re.compile(r"\b0x[a-fA-F0-9]{40}\b")
 SOL_ADDR_RE = re.compile(r"\b[1-9A-HJ-NP-Za-km-z]{32,44}\b")
 
 LAUNCH_SIGNAL_WORDS = [
-    "just went live",
     "is live",
-    "is live now",
-    "now trading",
-    "will be listing",
-    "launchpad is live",
-    "just launched",
-    "now live",
-    "officially launched",
-    "officially live",
-    "trading now",
-    "live on",
-    "launched on",
-    "listed on robinhood",
-    "now on robinhood",
-    "added to robinhood",
 ]
 
 
