@@ -17,11 +17,13 @@ import requests
 import config
 from signals import extract_signals, looks_like_launch
 from storage_json import load_seen, save_seen
+from stats import record_run
 
 logging.basicConfig(level=logging.INFO, format="%(asctime)s [%(levelname)s] %(message)s")
 log = logging.getLogger("scanner_gh")
 
 STATE_PATH = os.path.join(os.path.dirname(__file__), "state", "seen.json")
+STATS_PATH = os.path.join(os.path.dirname(__file__), "state", "stats.json")
 
 SEARCH_ENDPOINT = f"{config.TWITTERAPIS_BASE_URL}/tweet/advanced_search"
 
@@ -179,11 +181,12 @@ def process_watched_account_tweets(tweets, seen_ids) -> int:
 
 def main():
     seen_ids = load_seen(STATE_PATH)
-    new_alerts = 0
+    keyword_sent = 0
+    watch_sent = 0
 
     try:
         keyword_tweets = fetch_tweets(build_search_query())
-        new_alerts += process_keyword_tweets(keyword_tweets, seen_ids)
+        keyword_sent = process_keyword_tweets(keyword_tweets, seen_ids)
     except Exception as e:
         log.error("Keyword fetch failed: %s", e)
 
@@ -191,12 +194,21 @@ def main():
     if watch_query:
         try:
             watch_tweets = fetch_tweets(watch_query)
-            new_alerts += process_watched_account_tweets(watch_tweets, seen_ids)
+            watch_sent = process_watched_account_tweets(watch_tweets, seen_ids)
         except Exception as e:
             log.error("Watched-account fetch failed: %s", e)
 
     save_seen(STATE_PATH, seen_ids)
-    log.info("Run complete: %d new alert(s) sent, %d ids tracked", new_alerts, len(seen_ids))
+    stats = record_run(STATS_PATH, keyword_sent, watch_sent)
+    log.info(
+        "Run complete: %d new alert(s) sent (%d ids tracked). Lifetime total: %d alerts (%d keyword, %d watched-account) since %s",
+        keyword_sent + watch_sent,
+        len(seen_ids),
+        stats["total_alerts"],
+        stats["keyword_alerts"],
+        stats["watch_alerts"],
+        stats["since"],
+    )
 
 
 if __name__ == "__main__":
