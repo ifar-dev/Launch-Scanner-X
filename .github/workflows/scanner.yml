@@ -2,9 +2,9 @@ name: Meme Launch Scanner
 
 on:
   schedule:
-    # Every 5 minutes. GitHub Actions cron is best-effort and can lag
+    # Every 15 minutes. GitHub Actions cron is best-effort and can lag
     # a few minutes under load -- that's normal, not a bug.
-    - cron: "*/5 * * * *"
+    - cron: "*/15 * * * *"
   workflow_dispatch: {}   # lets you manually trigger a run from the Actions tab
 
 # Needed so the workflow can commit the updated state/seen.json file back
