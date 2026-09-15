@@ -1,8 +1,8 @@
 {
-  "total_alerts": 17,
-  "keyword_alerts": 17,
+  "total_alerts": 23,
+  "keyword_alerts": 23,
   "watch_alerts": 0,
   "since": "2026-09-15T12:47:35.944548+00:00",
-  "last_updated": "2026-09-15T13:22:25.204878+00:00",
-  "total_tweets_fetched": 40
+  "last_updated": "2026-09-15T13:39:25.264815+00:00",
+  "total_tweets_fetched": 60
 }
