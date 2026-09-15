@@ -40,7 +40,8 @@ def build_watch_query():
     if not config.WATCHED_ACCOUNTS:
         return None
     accounts = " OR ".join(f"from:{u}" for u in config.WATCHED_ACCOUNTS)
-    return f"({accounts}) -filter:replies -filter:retweets"
+    excludes = " ".join(f'-"{p}"' for p in config.EXCLUDE_PHRASES)
+    return f"({accounts}) {excludes} -filter:replies -filter:retweets".strip()
 
 
 def fetch_tweets(query: str):
@@ -134,8 +135,8 @@ def is_excluded(text: str) -> bool:
 
 
 def process_keyword_tweets(tweets, seen_ids) -> int:
-    """Require ALL THREE: a launch-phrase match, a ticker, AND a contract
-    address before alerting, excluding anything in EXCLUDE_PHRASES."""
+    """Existing logic: require BOTH a launch-phrase match AND a detected
+    ticker/contract before alerting, excluding anything in EXCLUDE_PHRASES."""
     sent = 0
     for tweet in tweets:
         tweet_id = str(tweet.get("id") or tweet.get("tweetId") or tweet.get("url"))
@@ -162,8 +163,9 @@ def process_keyword_tweets(tweets, seen_ids) -> int:
 
 
 def process_watched_account_tweets(tweets, seen_ids) -> int:
-    """Watched accounts: alert on ANY ticker/contract, no launch-phrase
-    requirement -- the account itself is the signal."""
+    """Watched accounts: same 3-part gate as keyword tweets (launch phrase +
+    ticker + contract), just sourced from specific accounts instead of a
+    broad search -- and skips EXCLUDE_PHRASES the same way."""
     sent = 0
     for tweet in tweets:
         tweet_id = str(tweet.get("id") or tweet.get("tweetId") or tweet.get("url"))
@@ -172,8 +174,16 @@ def process_watched_account_tweets(tweets, seen_ids) -> int:
         seen_ids[tweet_id] = datetime.now(timezone.utc).isoformat()
 
         text = tweet.get("text", "")
+        if is_excluded(text):
+            log.info("Excluded (watched account, matched EXCLUDE_PHRASES): %s", text[:100])
+            continue
+        if not looks_like_launch(text):
+            continue
+
         cashtags, eth_addrs, sol_addrs = extract_signals(text)
-        if not cashtags and not eth_addrs and not sol_addrs:
+        if not cashtags:
+            continue
+        if not eth_addrs and not sol_addrs:
             continue
 
         send_telegram_alert(format_watch_alert(tweet, cashtags, eth_addrs, sol_addrs))
