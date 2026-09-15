@@ -134,8 +134,8 @@ def is_excluded(text: str) -> bool:
 
 
 def process_keyword_tweets(tweets, seen_ids) -> int:
-    """Existing logic: require BOTH a launch-phrase match AND a detected
-    ticker/contract before alerting, excluding anything in EXCLUDE_PHRASES."""
+    """Require ALL THREE: a launch-phrase match, a ticker, AND a contract
+    address before alerting, excluding anything in EXCLUDE_PHRASES."""
     sent = 0
     for tweet in tweets:
         tweet_id = str(tweet.get("id") or tweet.get("tweetId") or tweet.get("url"))
@@ -151,7 +151,9 @@ def process_keyword_tweets(tweets, seen_ids) -> int:
             continue
 
         cashtags, eth_addrs, sol_addrs = extract_signals(text)
-        if not cashtags and not eth_addrs and not sol_addrs:
+        if not cashtags:
+            continue
+        if not eth_addrs and not sol_addrs:
             continue
 
         send_telegram_alert(format_alert(tweet, cashtags, eth_addrs, sol_addrs))
