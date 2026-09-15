@@ -183,9 +183,12 @@ def main():
     seen_ids = load_seen(STATE_PATH)
     keyword_sent = 0
     watch_sent = 0
+    tweets_fetched_total = 0
 
     try:
         keyword_tweets = fetch_tweets(build_search_query())
+        log.info("Fetched %d tweet(s) from keyword search", len(keyword_tweets))
+        tweets_fetched_total += len(keyword_tweets)
         keyword_sent = process_keyword_tweets(keyword_tweets, seen_ids)
     except Exception as e:
         log.error("Keyword fetch failed: %s", e)
@@ -194,19 +197,22 @@ def main():
     if watch_query:
         try:
             watch_tweets = fetch_tweets(watch_query)
+            log.info("Fetched %d tweet(s) from watched accounts", len(watch_tweets))
+            tweets_fetched_total += len(watch_tweets)
             watch_sent = process_watched_account_tweets(watch_tweets, seen_ids)
         except Exception as e:
             log.error("Watched-account fetch failed: %s", e)
 
     save_seen(STATE_PATH, seen_ids)
-    stats = record_run(STATS_PATH, keyword_sent, watch_sent)
+    stats = record_run(STATS_PATH, keyword_sent, watch_sent, tweets_fetched_total)
     log.info(
-        "Run complete: %d new alert(s) sent (%d ids tracked). Lifetime total: %d alerts (%d keyword, %d watched-account) since %s",
+        "Run complete: %d new alert(s) sent (%d ids tracked). Lifetime total: %d alerts (%d keyword, %d watched-account) from %d tweets fetched, since %s",
         keyword_sent + watch_sent,
         len(seen_ids),
         stats["total_alerts"],
         stats["keyword_alerts"],
         stats["watch_alerts"],
+        stats["total_tweets_fetched"],
         stats["since"],
     )
 
