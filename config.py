@@ -55,3 +55,8 @@ MAX_RESULTS_PER_POLL = 20
 # Each poll costs at least one $0.0008 call regardless of how many
 # results turn out to be new.
 POLL_INTERVAL_SECONDS = 900
+
+# How long (hours) to block a repeat alert for the SAME contract address,
+# even when a different account posts about it. Without this, a trending
+# CA gets re-alerted once per new poster, which feels like duplication.
+CONTRACT_DEDUP_HOURS = 48
