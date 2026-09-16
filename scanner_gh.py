@@ -18,12 +18,14 @@ import config
 from signals import extract_signals, looks_like_launch
 from storage_json import load_seen, save_seen
 from stats import record_run
+from contract_dedup import load_seen_contracts, save_seen_contracts, already_alerted, mark_alerted
 
 logging.basicConfig(level=logging.INFO, format="%(asctime)s [%(levelname)s] %(message)s")
 log = logging.getLogger("scanner_gh")
 
 STATE_PATH = os.path.join(os.path.dirname(__file__), "state", "seen.json")
 STATS_PATH = os.path.join(os.path.dirname(__file__), "state", "stats.json")
+CONTRACTS_PATH = os.path.join(os.path.dirname(__file__), "state", "seen_contracts.json")
 
 SEARCH_ENDPOINT = f"{config.TWITTERAPIS_BASE_URL}/tweet/advanced_search"
 
@@ -134,9 +136,10 @@ def is_excluded(text: str) -> bool:
     return any(p.lower() in lowered for p in config.EXCLUDE_PHRASES)
 
 
-def process_keyword_tweets(tweets, seen_ids) -> int:
-    """Existing logic: require BOTH a launch-phrase match AND a detected
-    ticker/contract before alerting, excluding anything in EXCLUDE_PHRASES."""
+def process_keyword_tweets(tweets, seen_ids, seen_contracts) -> int:
+    """Require ALL THREE: a launch-phrase match, a ticker, AND a contract
+    address before alerting, excluding anything in EXCLUDE_PHRASES. Also
+    skips if the contract address was already alerted recently (by anyone)."""
     sent = 0
     for tweet in tweets:
         tweet_id = str(tweet.get("id") or tweet.get("tweetId") or tweet.get("url"))
@@ -157,15 +160,22 @@ def process_keyword_tweets(tweets, seen_ids) -> int:
         if not eth_addrs and not sol_addrs:
             continue
 
+        contracts = list(eth_addrs) + list(sol_addrs)
+        if already_alerted(seen_contracts, contracts):
+            log.info("Skipped (contract already alerted recently): %s", contracts[0])
+            continue
+
         send_telegram_alert(format_alert(tweet, cashtags, eth_addrs, sol_addrs))
+        mark_alerted(seen_contracts, contracts)
         sent += 1
     return sent
 
 
-def process_watched_account_tweets(tweets, seen_ids) -> int:
+def process_watched_account_tweets(tweets, seen_ids, seen_contracts) -> int:
     """Watched accounts: same 3-part gate as keyword tweets (launch phrase +
     ticker + contract), just sourced from specific accounts instead of a
-    broad search -- and skips EXCLUDE_PHRASES the same way."""
+    broad search -- and skips EXCLUDE_PHRASES and already-alerted contracts
+    the same way."""
     sent = 0
     for tweet in tweets:
         tweet_id = str(tweet.get("id") or tweet.get("tweetId") or tweet.get("url"))
@@ -186,13 +196,20 @@ def process_watched_account_tweets(tweets, seen_ids) -> int:
         if not eth_addrs and not sol_addrs:
             continue
 
+        contracts = list(eth_addrs) + list(sol_addrs)
+        if already_alerted(seen_contracts, contracts):
+            log.info("Skipped (watched account, contract already alerted recently): %s", contracts[0])
+            continue
+
         send_telegram_alert(format_watch_alert(tweet, cashtags, eth_addrs, sol_addrs))
+        mark_alerted(seen_contracts, contracts)
         sent += 1
     return sent
 
 
 def main():
     seen_ids = load_seen(STATE_PATH)
+    seen_contracts = load_seen_contracts(CONTRACTS_PATH)
     keyword_sent = 0
     watch_sent = 0
     tweets_fetched_total = 0
@@ -201,7 +218,7 @@ def main():
         keyword_tweets = fetch_tweets(build_search_query())
         log.info("Fetched %d tweet(s) from keyword search", len(keyword_tweets))
         tweets_fetched_total += len(keyword_tweets)
-        keyword_sent = process_keyword_tweets(keyword_tweets, seen_ids)
+        keyword_sent = process_keyword_tweets(keyword_tweets, seen_ids, seen_contracts)
     except Exception as e:
         log.error("Keyword fetch failed: %s", e)
 
@@ -211,16 +228,18 @@ def main():
             watch_tweets = fetch_tweets(watch_query)
             log.info("Fetched %d tweet(s) from watched accounts", len(watch_tweets))
             tweets_fetched_total += len(watch_tweets)
-            watch_sent = process_watched_account_tweets(watch_tweets, seen_ids)
+            watch_sent = process_watched_account_tweets(watch_tweets, seen_ids, seen_contracts)
         except Exception as e:
             log.error("Watched-account fetch failed: %s", e)
 
     save_seen(STATE_PATH, seen_ids)
+    save_seen_contracts(CONTRACTS_PATH, seen_contracts, config.CONTRACT_DEDUP_HOURS)
     stats = record_run(STATS_PATH, keyword_sent, watch_sent, tweets_fetched_total)
     log.info(
-        "Run complete: %d new alert(s) sent (%d ids tracked). Lifetime total: %d alerts (%d keyword, %d watched-account) from %d tweets fetched, since %s",
+        "Run complete: %d new alert(s) sent (%d ids tracked, %d contracts tracked). Lifetime total: %d alerts (%d keyword, %d watched-account) from %d tweets fetched, since %s",
         keyword_sent + watch_sent,
         len(seen_ids),
+        len(seen_contracts),
         stats["total_alerts"],
         stats["keyword_alerts"],
         stats["watch_alerts"],
