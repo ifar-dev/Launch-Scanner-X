@@ -8,6 +8,8 @@ SOL_ADDR_RE = re.compile(r"\b[1-9A-HJ-NP-Za-km-z]{32,44}\b")
 
 LAUNCH_SIGNAL_WORDS = [
     "is live",
+    "is now live",
+    "is officially live",
 ]
 
 
