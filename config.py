@@ -22,6 +22,8 @@ TWITTERAPIS_BASE_URL = "https://api.twitterapis.com/twitter"
 # mean more noise and more billed calls per poll.
 SEARCH_TERMS = [
     "is live",
+    "is now live",
+    "is officially live",
 ]
 
 # Phrases that should NEVER trigger an alert, even if they match a search
