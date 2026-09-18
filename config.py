@@ -50,8 +50,11 @@ WATCHED_ACCOUNTS = [
 # per call regardless of this number -- set it to a multiple of 20 and the
 # scanner will page (via cursor) to fetch that many, each page = 1 billed call.
 # Cost math: (86400 / POLL_INTERVAL_SECONDS) * (MAX_RESULTS_PER_POLL / 20) * $0.0008
-# At the settings below: ~96 polls/day * 1 call/poll * $0.0008 = ~$0.08/day.
-MAX_RESULTS_PER_POLL = 20
+# At the settings below: ~96 polls/day * 3 calls/poll * $0.0008 = ~$0.23/day.
+# Raised from 20 to 60 to reduce missed tweets during high-volume windows
+# (MAX_RESULTS_PER_POLL only grabs the latest N each poll -- anything pushed
+# past that count before the next poll is missed permanently).
+MAX_RESULTS_PER_POLL = 60
 
 # How often to poll, in seconds. 15 minutes cuts cost roughly 3x vs 5-min
 # polling while still catching a launch well within its early window.
