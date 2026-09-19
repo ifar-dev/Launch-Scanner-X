@@ -25,6 +25,7 @@ SEARCH_TERMS = [
     "is now live",
     "is officially live",
     ".fun",
+    "CA:",
 ]
 
 # Phrases that should NEVER trigger an alert, even if they match a search
