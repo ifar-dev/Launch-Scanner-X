@@ -8,13 +8,23 @@ so you don't accidentally commit secrets anywhere).
 import os
 
 # --- Telegram ---------------------------------------------------------
-TELEGRAM_BOT_TOKEN = os.environ.get("TELEGRAM_BOT_TOKEN", "PUT_YOUR_BOT_TOKEN_HERE")
-TELEGRAM_CHAT_ID = os.environ.get("TELEGRAM_CHAT_ID", "PUT_YOUR_CHAT_ID_HERE")
+TELEGRAM_BOT_TOKEN = os.environ.get(
+    "TELEGRAM_BOT_TOKEN",
+    "PUT_YOUR_BOT_TOKEN_HERE",
+)
+TELEGRAM_CHAT_ID = os.environ.get(
+    "TELEGRAM_CHAT_ID",
+    "PUT_YOUR_CHAT_ID_HERE",
+)
 
 # --- TwitterAPIs.com (X/Twitter data source) ----------------------------
-TWITTERAPIS_API_KEY = os.environ.get("TWITTERAPIS_API_KEY", "PUT_YOUR_TWITTERAPIS_KEY_HERE")
+TWITTERAPIS_API_KEY = os.environ.get(
+    "TWITTERAPIS_API_KEY",
+    "PUT_YOUR_TWITTERAPIS_KEY_HERE",
+)
 TWITTERAPIS_BASE_URL = "https://api.twitterapis.com/twitter"
-# ~20 tweets per call at $0.0008/call. Verify current pricing at
+
+# ~20 tweets per call. Verify current pricing at
 # https://www.twitterapis.com/pricing before relying on it long-term.
 
 # --- Search behavior -----------------------------------------------------
@@ -47,21 +57,14 @@ WATCHED_ACCOUNTS = [
     # "anotheraccount",
 ]
 
-# How many results to pull per poll. TwitterAPIs.com returns ~20 tweets
-# per call regardless of this number -- set it to a multiple of 20 and the
-# scanner will page (via cursor) to fetch that many, each page = 1 billed call.
-# Cost math: (86400 / POLL_INTERVAL_SECONDS) * (MAX_RESULTS_PER_POLL / 20) * $0.0008
-# At the settings below: ~96 polls/day * 3 calls/poll * $0.0008 = ~$0.23/day.
-# Raised from 20 to 60 to reduce missed tweets during high-volume windows
-# (MAX_RESULTS_PER_POLL only grabs the latest N each poll -- anything pushed
-# past that count before the next poll is missed permanently).
-MAX_RESULTS_PER_POLL = 60
+# How many results to pull per poll.
+# TwitterAPIs.com returns ~20 tweets per call.
+# Keeping this at 20 means one search call per poll.
+MAX_RESULTS_PER_POLL = 20
 
-# How often to poll, in seconds. 15 minutes cuts cost roughly 3x vs 5-min
-# polling while still catching a launch well within its early window.
-# Each poll costs at least one $0.0008 call regardless of how many
-# results turn out to be new.
-POLL_INTERVAL_SECONDS = 900
+# How often to poll, in seconds.
+# 300 seconds = 5 minutes.
+POLL_INTERVAL_SECONDS = 300
 
 # How long (hours) to block a repeat alert for the SAME contract address,
 # even when a different account posts about it. Without this, a trending
