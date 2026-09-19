@@ -15,7 +15,7 @@ from datetime import datetime, timezone
 import requests
 
 import config
-from signals import extract_signals, looks_like_launch, has_fun_domain
+from signals import extract_signals, looks_like_launch, has_project_domain
 from storage_json import load_seen, save_seen
 from stats import record_run
 from contract_dedup import load_seen_contracts, save_seen_contracts, already_alerted, mark_alerted
@@ -137,7 +137,7 @@ def is_excluded(text: str) -> bool:
 
 
 def process_keyword_tweets(tweets, seen_ids, seen_contracts) -> int:
-    """Require: (a launch phrase OR a .fun domain) AND a ticker AND a
+    """Require: (a launch phrase OR a project domain) AND a ticker AND a
     contract address before alerting, excluding EXCLUDE_PHRASES and
     already-alerted contracts."""
     sent = 0
@@ -151,7 +151,7 @@ def process_keyword_tweets(tweets, seen_ids, seen_contracts) -> int:
         if is_excluded(text):
             log.info("Excluded (matched EXCLUDE_PHRASES): %s", text[:100])
             continue
-        if not looks_like_launch(text) and not has_fun_domain(text):
+        if not looks_like_launch(text) and not has_project_domain(text):
             continue
 
         cashtags, eth_addrs, sol_addrs = extract_signals(text)
@@ -172,7 +172,7 @@ def process_keyword_tweets(tweets, seen_ids, seen_contracts) -> int:
 
 
 def process_watched_account_tweets(tweets, seen_ids, seen_contracts) -> int:
-    """Watched accounts: same gate as keyword tweets ((phrase OR .fun) +
+    """Watched accounts: same gate as keyword tweets ((phrase OR domain) +
     ticker + contract), just sourced from specific accounts instead of a
     broad search -- and skips EXCLUDE_PHRASES and already-alerted contracts
     the same way."""
@@ -187,7 +187,7 @@ def process_watched_account_tweets(tweets, seen_ids, seen_contracts) -> int:
         if is_excluded(text):
             log.info("Excluded (watched account, matched EXCLUDE_PHRASES): %s", text[:100])
             continue
-        if not looks_like_launch(text) and not has_fun_domain(text):
+        if not looks_like_launch(text) and not has_project_domain(text):
             continue
 
         cashtags, eth_addrs, sol_addrs = extract_signals(text)
