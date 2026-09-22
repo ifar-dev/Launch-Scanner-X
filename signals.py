@@ -5,11 +5,34 @@ import re
 CASHTAG_RE = re.compile(r"\$([A-Za-z]{2,10})\b")
 ETH_ADDR_RE = re.compile(r"\b0x[a-fA-F0-9]{40}\b")
 SOL_ADDR_RE = re.compile(r"\b[1-9A-HJ-NP-Za-km-z]{32,44}\b")
-# Matches a project domain in common crypto-launch TLDs: pump.fun,
-# heyaskr.ai, fairlaunch.gg, etc. Not exhaustive, but covers the TLDs
-# these launch posts actually use.
+
+# TLDs that count as a "project domain" signal. Grouped for maintainability:
+# - Core/general: the original curated set
+# - Web3-native naming (ENS, Unstoppable Domains etc.)
+# - Crypto/finance-flavored gTLDs
+# - Broad set of tech/business gTLDs commonly used by crypto/SaaS projects
+_PROJECT_TLDS = [
+    # core / general
+    "fun", "ai", "io", "gg", "xyz", "com", "net", "org", "app", "co", "so",
+    "meme", "wtf", "lol", "finance", "money", "cash",
+    # web3-native naming systems
+    "eth", "crypto", "nft", "dao", "wallet", "bitcoin", "blockchain",
+    # crypto/finance flavored
+    "exchange", "trade", "markets", "capital", "fund", "ventures", "network",
+    "tech", "dev", "digital", "community",
+    # broad tech/business set
+    "academy", "accountant", "agency", "art", "auto", "best", "bio", "blog",
+    "camera", "chat", "cloud", "club", "codes", "coffee", "company",
+    "computer", "design", "domains", "download", "estate", "expert", "farm",
+    "games", "global", "guru", "health", "help", "host", "house", "icu",
+    "info", "ink", "land", "life", "live", "market", "media", "news",
+    "online", "party", "press", "pro", "pub", "realestate", "red", "rocks",
+    "run", "services", "shop", "site", "social", "software", "space",
+    "store", "studio", "support", "team", "today", "tools", "top", "travel",
+    "video", "website", "wiki", "world",
+]
 PROJECT_DOMAIN_RE = re.compile(
-    r"\b[a-zA-Z0-9-]+\.(?:fun|ai|io|gg|xyz|com|net|org|app|co|so|meme|wtf|lol|finance|money|cash)\b",
+    r"\b[a-zA-Z0-9-]+\.(?:" + "|".join(_PROJECT_TLDS) + r")\b",
     re.IGNORECASE,
 )
 
@@ -34,5 +57,5 @@ def looks_like_launch(text: str) -> bool:
 
 def has_project_domain(text: str) -> bool:
     """True if text mentions a project domain (pump.fun, heyaskr.ai, etc.)
-    in a common crypto-launch TLD."""
+    in a common crypto-launch or general tech/business TLD."""
     return bool(PROJECT_DOMAIN_RE.search(text))
